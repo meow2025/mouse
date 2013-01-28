@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-from evdev import InputDevice, categorize, ecodes, UInput
+from evdev import InputDevice, categorize, ecodes, UInput, list_devices
 import time
 import os
 
 script_name = 'sample'
-dev_path = '/dev/input/event4'
+dev_name = 'A4TECH USB Device'
+dev_phys = 'usb-0000:00:1d.0-1.2/input0'
 operations = []
 
 
@@ -34,6 +35,13 @@ except:
     exit(1)
 
 try:
+    dev_path = None
+    for dev in map(InputDevice, list_devices()):
+        if dev.name == dev_name and dev.phys == dev_phys:
+            dev_path = dev.fn
+    if not dev_path:
+        print 'No matching device'
+        exit(1)
     dev = InputDevice(dev_path)
     dev.grab()
     ui = UInput()
